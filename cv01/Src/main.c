@@ -25,19 +25,25 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
-int main(void)
-{
+int main(void) {
+	uint32_t sos_msg = 0b10101001110111011100101010000000; // SOS Message
 
 	// GPIO init
 	RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
 	GPIOA->MODER |= GPIO_MODER_MODER5_0;
 
-    // Infinite loop
-	for(;;) {
+	// Infinite loop
+	while (1) {
+		for (uint8_t ind = 0; ind < 32; ind++)
+		{
+			if (sos_msg & (1UL <<ind)) {
+				GPIOA->BSRR = (1<<5); // ON
+			} else {
+				GPIOA->BRR = (1<<5); // OF
+			}
 
-		GPIOA->ODR ^= (1<<5); // toggle
-		for (volatile uint32_t i = 0; i < 100000; i++) {}
-
-
+			for (volatile uint32_t i = 0; i < 100000; i++) {} // wait
+		}
 	}
+
 }
