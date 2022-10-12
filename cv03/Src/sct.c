@@ -1,3 +1,9 @@
+/*
+ * sct.c
+ *
+ *  Created on: 11. 10. 2022
+ *      Author: xmarca00
+ */
 #include <stdint.h>
 #include "stm32f0xx.h"
 #include "sct.h"

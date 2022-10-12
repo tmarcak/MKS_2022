@@ -29,7 +29,8 @@
 int main(void)
 {
 	sct_init();
-	//sct_led(0x7A5C36DE);
+	sct_led(0x7A5C36DE);
+
 
 	while (1) {
 		for(uint32_t i = 0; i<999; i+=111){
