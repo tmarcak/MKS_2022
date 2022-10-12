@@ -2,7 +2,7 @@
  * sct.h
  *
  *  Created on: 11. 10. 2022
- *      Author:
+ *      Author: xmarca00
  */
 
 #ifndef SCT_H_
