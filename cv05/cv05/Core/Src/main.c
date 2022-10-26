@@ -18,7 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -31,6 +31,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define RX_BUFFER_LEN 64	//ulozenie surovych dat
+#define CMD_BUFFER_LEN 256	//ulozenie jedneho celeho prikazu
+#define uart_rx_write_ptr (RX_BUFFER_LEN - hdma_usart2_rx.Instance->CNDTR)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,14 +43,17 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
-
+static uint8_t uart_rx_buf[RX_BUFFER_LEN];
+static volatile uint16_t uart_rx_read_ptr = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -55,6 +61,30 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+int _write(int file, char const *buf, int n)
+{
+ /* stdout redirection to UART2 */
+ HAL_UART_Transmit(&huart2, (uint8_t*)(buf), n, HAL_MAX_DELAY);
+ return n;
+}
+
+void uart_process_command(char *cmd) {
+	printf("Received: '%s'\n", cmd);
+
+}
+
+static void uart_byte_available(uint8_t c) {
+	static uint16_t cnt;
+	static char data[CMD_BUFFER_LEN];
+	//kontroluje ci je v datovom buffery este miesto
+
+	if (cnt < CMD_BUFFER_LEN && c >= 32 && c <= 126) data[cnt++] = c;
+	if ((c == '\n' || c == '\r') && cnt > 0) {
+		data[cnt] = '\0';
+		uart_process_command(data);
+		cnt = 0;
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -86,18 +116,28 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Receive_DMA(&huart2, uart_rx_buf, RX_BUFFER_LEN);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
 
+	  while (uart_rx_read_ptr != uart_rx_write_ptr) {
+		  uint8_t b = uart_rx_buf[uart_rx_read_ptr];
+		  if (++uart_rx_read_ptr >= RX_BUFFER_LEN) uart_rx_read_ptr = 0;		// increase read pointer
+
+		  uart_byte_available(b); 												// process every received byte with the RX state machine
+	  }
+
+	  /*
 	  uint8_t c;
 	  HAL_UART_Receive(&huart2, &c, 1, HAL_MAX_DELAY);
 	  HAL_UART_Transmit(&huart2, &c, 1, HAL_MAX_DELAY);
+	  */
 
     /* USER CODE END WHILE */
 
@@ -176,6 +216,22 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel4_5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel4_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel4_5_IRQn);
 
 }
 
