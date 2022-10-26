@@ -232,7 +232,6 @@ int main(void)
 	  while (uart_rx_read_ptr != uart_rx_write_ptr) {
 		  uint8_t b = uart_rx_buf[uart_rx_read_ptr];
 		  if (++uart_rx_read_ptr >= RX_BUFFER_LEN) uart_rx_read_ptr = 0;		// increase read pointer
-
 		  uart_byte_available(b); 												// process every received byte with the RX state machine
 	  }
 
