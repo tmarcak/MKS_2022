@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "1wire.h"
 #include "sct.h"
+#include "data.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,6 +94,9 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC_Init();
   /* USER CODE BEGIN 2 */
+  HAL_ADCEx_Calibration_Start(&hadc);
+  HAL_ADC_Start(&hadc);
+
   OWInit();
   sct_init();
   /* USER CODE END 2 */
@@ -100,13 +104,22 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+
+	  uint16_t adc;
+	  adc = HAL_ADC_GetValue(&hadc);			//vycitenie hodnoty z AD prevodniku
+	  sct_value(NTC_DATA[adc], 0);				//zobrazenie na dipleji
+	  HAL_Delay(100);
+
+	  /*2.2
 	  int16_t temp_18b20;
 
 	  OWConvertAll();
-	  HAL_Delay(CONVERT_T_DELAY);
-	  OWReadTemperature(&temp_18b20);
+	  HAL_Delay(CONVERT_T_DELAY);  				//cakanie po dobu prevodu
+	  OWReadTemperature(&temp_18b20);			//citanie vysledku
 
-	  sct_value(temp_18b20/10, 0);
+	  sct_value(temp_18b20/10, 0);				//zobrazenie na displeji
+	  */
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
