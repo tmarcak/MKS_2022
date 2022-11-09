@@ -491,11 +491,11 @@ void StartAcceleroTask(void const *argument) {
 
 		// UART init
 		uint8_t c;
-		HAL_UART_Receive(&huart2, &c, 1, HAL_MAX_DELAY);
-		HAL_UART_Transmit(&huart2, &c, 1, HAL_MAX_DELAY);
+		//HAL_UART_Receive(&huart2, &c, 1, HAL_MAX_DELAY);
+		//HAL_UART_Transmit(&huart2, &c, 1, HAL_MAX_DELAY);
 
 	}
-	osDelay(1);
+
 }
 
 /* USER CODE END StartAcceleroTask */
