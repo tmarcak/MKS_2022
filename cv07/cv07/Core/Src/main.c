@@ -284,10 +284,28 @@ void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+	for(;;) {
+
+		int16_t msg;
+		xQueueSend(xVisualQueueHandle, &msg, 0);
+
+		msg = -5000;
+		xQueueSend(xVisualQueueHandle, &msg, 0);
+		osDelay(300);
+
+		msg = 0;
+		xQueueSend(xVisualQueueHandle, &msg, 0);
+		osDelay(300);
+
+		msg = 5000;
+		xQueueSend(xVisualQueueHandle, &msg, 0);
+		osDelay(300);
+
+		msg = 0;
+		xQueueSend(xVisualQueueHandle, &msg, 0);
+		osDelay(300);
+
+	}
   /* USER CODE END 5 */
 }
 
@@ -302,10 +320,29 @@ void StartVisualTask(void const * argument)
 {
   /* USER CODE BEGIN StartVisualTask */
   /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
+
+	int16_t msg;
+
+	for(;;) {
+		if (xQueueReceive(xVisualQueueHandle, &msg, portMAX_DELAY)) {
+			if (msg < -1000) {
+				HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 1);
+				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
+			}
+
+			else if (msg > 1000) {
+				HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);
+				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
+			}
+
+			else {
+				HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, 0);
+				HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
+			}
+		}
+		osDelay(1);
+	}
+
   /* USER CODE END StartVisualTask */
 }
 
