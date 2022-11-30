@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include  <stdio.h>
 
 /* USER CODE END Includes */
@@ -40,6 +41,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+
 TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart3;
@@ -158,12 +160,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-	  //HAL_Delay(250);
+	  /*
+	  HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+	  HAL_Delay(250);
+	  */
 
 	  static int8_t correct = 0;
 	  static int16_t index = 0;
-	  static int32_t timer = 0;
+	  static uint32_t timer = 0;
 
 	  if (HAL_GetTick() > timer + 3000 && index > 0) {
 		  index = 0;
@@ -206,7 +210,7 @@ int main(void)
 		  else if (correct != 5 && index == 5){
 			  printf("Nespravne heslo\n");
 
-			  for (int16_t i; i < 6; i++){
+			  for (uint8_t i = 0; i < 6; i++){
 				  HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 				  HAL_Delay(200);
 			  }
