@@ -297,6 +297,7 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN 5 */
   tcpecho_init();
   httpd_init();
+  telnet_init();
   /* Infinite loop */
   for(;;)
   {
